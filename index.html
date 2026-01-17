@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Testing ml-axios</title>
+    <style>
+        body { font-family: sans-serif; text-align: center; padding: 20px; }
+        img { max-width: 300px; border-radius: 10px; }
+        #result { margin-top: 20px; font-weight: bold; color: #2c3e50; }
+    </style>
+    
+</head>
+<body>
+    <h1>ML-Axios Test Page</h1>
+    
+    <img id="test-img" src="https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=300" crossorigin="anonymous">
+    
+    <div id="result">Status: Loading model...</div>
+
+    <script type="module">
+        // In a real app, you'd import from 'ml-axios'
+        // Here, we point directly to your built file
+        import ml from './dist/index.mjs';
+       
+console.log("ML Instance:", ml); 
+console.log("Interceptors:", ml.interceptors);
+
+        async function runTest() {
+            const status = document.getElementById('result');   
+            const img = document.getElementById('test-img');
+
+            try {
+                // 1. Load a real pre-trained model
+                const modelUrl = 'https://tfhub.dev/google/tfjs-model/imagenet/mobilenet_v2_100_224/classification/3/default/1';
+                const model = await ml.load(modelUrl);
+                status.innerText = "Status: Model Loaded. Predicting...";
+
+               
+
+                // 3. Run Inference
+                const response = await ml.predict(model, img);
+
+                // 4. Show output
+                console.log("Full Response:", response);
+                status.innerHTML = `
+                    <p>Prediction Successful!</p>
+                    <p>Latency: ${response.latency.toFixed(2)}ms</p>
+                    <p>Device: ${response.device}</p>
+                `;
+            } catch (err) {
+                status.innerText = "Error: " + err.message;
+                console.error(err);
+            }
+        }
+
+        runTest();
+    </script>
+</body>
+</html>
